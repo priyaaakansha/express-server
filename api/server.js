@@ -4,6 +4,10 @@ const router = express.Router();
 
 app.use(express.json());
 
+router.get('/', (req, res) => {
+    res.send(`Hello, server is running!`);
+});
+
 // GET API to respond with "Hello, {name}" from query parameter
 router.get('/hello', (req, res) => {
     const name = req.query.name || 'World'; // Default to 'World' if no name is provided
