@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const fs = require('fs');
 const app = express();
 const router = express.Router();
 
@@ -10,9 +9,9 @@ app.use(express.json());
 
 const secretKey = process.env.SECRET_KEY;
 const port = process.env.PORT || 3000;
-const path = require('path');
-const usersFilePath = path.join(__dirname, 'public', 'users.txt');
 
+// In-memory store for users
+const users = new Map();
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -27,21 +26,23 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+//  route
+router.get('/', async (req, res) => {
+      res.status(200).send("Hello server is running!")
+    })
+
 // Signup route
 router.post('/signup', async (req, res) => {
     const { username, password } = req.body;
 
     // Check if the user already exists
-    const users = fs.readFileSync(usersFilePath, 'utf8').split('\n');
-    const userExists = users.some(user => user.split(':')[0] === username);
-
-    if (userExists) {
+    if (users.has(username)) {
         return res.status(409).send('User already exists');
     }
 
-    // Hash the password and save it to the file
+    // Hash the password and save it to the in-memory store
     const hashedPassword = await bcrypt.hash(password, 10);
-    fs.appendFileSync(usersFilePath, `${username}:${hashedPassword}\n`);
+    users.set(username, hashedPassword);
     
     res.status(201).send('User registered successfully');
 });
@@ -50,15 +51,12 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    // Retrieve users from the file
-    const users = fs.readFileSync(usersFilePath, 'utf8').split('\n');
-    const user = users.find(user => user.split(':')[0] === username);
+    // Retrieve the hashed password from the in-memory store
+    const storedHashedPassword = users.get(username);
 
-    if (!user) {
+    if (!storedHashedPassword) {
         return res.status(400).send('Cannot find user');
     }
-
-    const [storedUsername, storedHashedPassword] = user.split(':');
 
     // Verify the password
     if (await bcrypt.compare(password, storedHashedPassword)) {
