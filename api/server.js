@@ -10,7 +10,8 @@ app.use(express.json());
 
 const secretKey = process.env.SECRET_KEY;
 const port = process.env.PORT || 3000;
-const usersFilePath = './data/users.txt';
+const path = require('path');
+const usersFilePath = path.join(__dirname, 'public', 'users.txt');
 
 
 const authenticateToken = (req, res, next) => {
