@@ -35,7 +35,6 @@ router.get('/', async (req, res) => {
 router.post('/signup', async (req, res) => {
     const { username, password } = req.body;
 
-    // Check if the user already exists
     if (users.has(username)) {
         return res.status(409).send('User already exists');
     }
@@ -51,7 +50,6 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    // Retrieve the hashed password from the in-memory store
     const storedHashedPassword = users.get(username);
 
     if (!storedHashedPassword) {
