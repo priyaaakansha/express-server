@@ -1,7 +1,10 @@
-require('dotenv').config();
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+import dotenv from 'dotenv';
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+
+dotenv.config();
+
 const app = express();
 const router = express.Router();
 
@@ -26,10 +29,10 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-//  route
-router.get('/', async (req, res) => {
-      res.status(200).send("Hello server is running!")
-    })
+// Root route
+router.get('/', (req, res) => {
+    res.status(200).send("Hello, server is running!");
+});
 
 // Signup route
 router.post('/signup', async (req, res) => {
@@ -77,4 +80,4 @@ app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
 
-module.exports = app;
+export default app;
